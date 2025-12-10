@@ -118,40 +118,45 @@ function App() {
   const goToToday = () => setCurrentDate(new Date())
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
         <Card>
           <CardHeader>
             <CardTitle className="text-3xl">Hours Tracker</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Date Navigation */}
-            <div className="flex items-center justify-between">
-              <Button onClick={goToPreviousDay} variant="outline" size="icon">
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-
-              <div className="flex items-center gap-4">
-                <h2 className="text-xl font-semibold">
+            {/* Date Display and Navigation */}
+            <div className="space-y-4">
+              {/* Current Date - Always on top on mobile, inline on desktop */}
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <h2 className="text-xl md:text-2xl font-semibold text-center md:text-left">
                   {format(currentDate, 'EEEE, MMMM d, yyyy')}
                 </h2>
-                <Input
-                  type="date"
-                  value={dateStr}
-                  onChange={(e) => setCurrentDate(new Date(e.target.value))}
-                  className="w-auto"
-                />
+
+                {/* Navigation controls - Below date on mobile, right side on desktop */}
+                <div className="flex items-center justify-center gap-2 md:gap-4">
+                  <Button onClick={goToPreviousDay} variant="outline" size="icon">
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+
+                  <Input
+                    type="date"
+                    value={dateStr}
+                    onChange={(e) => setCurrentDate(new Date(e.target.value))}
+                    className="w-auto"
+                  />
+
+                  <Button onClick={goToNextDay} variant="outline" size="icon">
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
 
-              <Button onClick={goToNextDay} variant="outline" size="icon">
-                <ChevronRight className="h-4 w-4" />
+              <Button onClick={goToToday} variant="secondary" className="w-full">
+                <Calendar className="h-4 w-4 mr-2" />
+                Go to Today
               </Button>
             </div>
-
-            <Button onClick={goToToday} variant="secondary" className="w-full">
-              <Calendar className="h-4 w-4 mr-2" />
-              Go to Today
-            </Button>
 
             {/* Add Hour Form */}
             <Card className="bg-blue-50 border-blue-200">
