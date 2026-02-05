@@ -1,30 +1,9 @@
 services:
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile.backend
-    container_name: hours-tracker-backend
-    ports:
-      - "3001:3001"
-    volumes:
-      - ./server/hours.db:/app/server/hours.db
-    restart: unless-stopped
-    networks:
-      - hours-tracker-network
-
   frontend:
     build:
       context: ./client
       dockerfile: Dockerfile
-    container_name: hours-tracker-frontend
+    container_name: hours-tracker
     ports:
       - "80:80"
-    depends_on:
-      - backend
     restart: unless-stopped
-    networks:
-      - hours-tracker-network
-
-networks:
-  hours-tracker-network:
-    driver: bridge

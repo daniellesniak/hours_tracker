@@ -1,6 +1,6 @@
 # Hours Tracker
 
-A simple hours tracking application built with Express, React, shadcn/ui, and SQLite.
+A simple hours tracking application built with React, shadcn/ui, and browser localStorage.
 
 ## Features
 
@@ -10,37 +10,33 @@ A simple hours tracking application built with Express, React, shadcn/ui, and SQ
 - Edit and delete existing entries
 - Automatic calculation of total time worked
 - Clean, modern UI with shadcn components
+- **100% client-side** - No backend server required!
+- Data stored locally in your browser
 
 ## Tech Stack
 
-- **Backend**: Express.js with SQLite database
 - **Frontend**: React with Vite
 - **UI Components**: shadcn/ui with Tailwind CSS
-- **Database**: SQLite (sqlite3)
+- **Storage**: Browser localStorage (fully client-side)
+- **Deployment**: Static files served with Nginx
 
 ## Running the Application
 
 ### Option 1: Docker (Recommended)
 
-The easiest way to run the application is using Docker Compose:
+The easiest way to run the application is using Docker:
 
 ```bash
 docker-compose up -d
 ```
 
 This will:
-- Build and start both backend and frontend containers
-- Backend API available on http://localhost:3001
-- Frontend application available on http://localhost:80
+- Build and start the application container
+- Application available on http://localhost:80
 
-To stop the containers:
+To stop the container:
 ```bash
 docker-compose down
-```
-
-To view logs:
-```bash
-docker-compose logs -f
 ```
 
 To rebuild after code changes:
@@ -52,46 +48,29 @@ docker-compose up -d --build
 
 #### Installation
 
-1. Install backend dependencies:
-```bash
-npm install
-```
-
-2. Install frontend dependencies:
+Install dependencies:
 ```bash
 cd client
 npm install
-cd ..
-```
-
-Or use the convenience script:
-```bash
-npm run install-all
 ```
 
 #### Running
 
-**Run both backend and frontend together:**
-
+Start the development server:
 ```bash
 npm run dev
 ```
 
-This will start:
-- Backend server on http://localhost:3001
-- Frontend dev server on http://localhost:5173
+The application will be available at http://localhost:5173
 
-**Or run separately:**
+#### Build for Production
 
-In one terminal, start the backend:
+To create a production build:
 ```bash
-node server/index.js
+npm run build
 ```
 
-In another terminal, start the frontend:
-```bash
-cd client && npm run dev
-```
+The built files will be in the `dist` folder and can be served by any static file server.
 
 ## Usage
 
@@ -106,34 +85,50 @@ cd client && npm run dev
 7. Delete entries by clicking the trash icon
 8. View total time worked at the top of the entries list
 
+**Note**: All data is stored in your browser's localStorage. Data persists across sessions but is specific to the browser and domain.
+
 ## Project Structure
 
 ```
 hours_tracker/
-├── server/
-│   ├── database.js         # SQLite database setup
-│   ├── index.js            # Express API server
-│   └── hours.db            # SQLite database file (created on first run)
 ├── client/
 │   ├── src/
 │   │   ├── components/ui/  # shadcn components
-│   │   ├── lib/            # utility functions
+│   │   ├── lib/
+│   │   │   ├── storage.js  # localStorage utility functions
+│   │   │   └── utils.js    # general utilities
 │   │   ├── App.jsx         # Main application component
 │   │   ├── main.jsx        # React entry point
 │   │   └── index.css       # Global styles
-│   ├── Dockerfile          # Frontend Docker configuration
+│   ├── Dockerfile          # Docker configuration
 │   ├── nginx.conf          # Nginx configuration for production
 │   ├── index.html
 │   ├── package.json
 │   └── vite.config.js
-├── Dockerfile.backend      # Backend Docker configuration
-├── docker-compose.yml      # Docker Compose orchestration
-└── package.json
+└── docker-compose.yml      # Docker Compose orchestration
 ```
 
-## API Endpoints
+## Data Storage
 
-- `GET /api/hours/:date` - Get all hours for a specific date
-- `POST /api/hours` - Add a new hour entry
-- `PUT /api/hours/:id` - Update an hour entry
-- `DELETE /api/hours/:id` - Delete an hour entry
+The application uses browser localStorage to store all data client-side. Data structure:
+
+```javascript
+{
+  id: number,           // Unique identifier (timestamp)
+  date: string,         // Date in YYYY-MM-DD format
+  time_from: string,    // Start time in HH:MM format
+  time_to: string,      // End time in HH:MM format
+  created_at: string    // ISO timestamp
+}
+```
+
+## Deployment
+
+Since this is a fully client-side application, you can deploy it anywhere that serves static files:
+
+- **GitHub Pages**: Push the `dist` folder after running `npm run build`
+- **Netlify/Vercel**: Connect your repository and deploy automatically
+- **Any static file hosting**: Upload the contents of `dist` folder
+- **Docker**: Use the provided `docker-compose.yml` for containerized deployment
+
+No server-side configuration needed!

@@ -5,8 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
+import * as storage from '@/lib/storage'
 
 function App() {
   const [currentDate, setCurrentDate] = useState(new Date())
@@ -20,50 +19,27 @@ function App() {
   const dateStr = format(currentDate, 'yyyy-MM-dd')
 
   useEffect(() => {
-    fetchHours()
+    loadHours()
   }, [currentDate])
 
-  const fetchHours = async () => {
-    try {
-      const response = await fetch(`${API_URL}/hours/${dateStr}`)
-      const data = await response.json()
-      setHours(data)
-    } catch (error) {
-      console.error('Error fetching hours:', error)
-    }
+  const loadHours = () => {
+    const data = storage.getHoursByDate(dateStr)
+    setHours(data)
   }
 
-  const addHour = async (e) => {
+  const handleAddHour = (e) => {
     e.preventDefault()
     if (!timeFrom || !timeTo) return
 
-    try {
-      await fetch(`${API_URL}/hours`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          date: dateStr,
-          time_from: timeFrom,
-          time_to: timeTo,
-        }),
-      })
-      setTimeFrom('')
-      setTimeTo('')
-      fetchHours()
-    } catch (error) {
-      console.error('Error adding hour:', error)
-    }
+    storage.addHour(dateStr, timeFrom, timeTo)
+    setTimeFrom('')
+    setTimeTo('')
+    loadHours()
   }
 
-  const deleteHour = async (id) => {
-    try {
-      await fetch(`${API_URL}/hours/${id}`, {
-        method: 'DELETE',
-      })
-      fetchHours()
-    } catch (error) {
-      console.error('Error deleting hour:', error)
-    }
+  const handleDeleteHour = (id) => {
+    storage.deleteHour(id)
+    loadHours()
   }
 
   const startEdit = (hour) => {
@@ -78,21 +54,10 @@ function App() {
     setEditTimeTo('')
   }
 
-  const saveEdit = async (id) => {
-    try {
-      await fetch(`${API_URL}/hours/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          time_from: editTimeFrom,
-          time_to: editTimeTo,
-        }),
-      })
-      setEditingId(null)
-      fetchHours()
-    } catch (error) {
-      console.error('Error updating hour:', error)
-    }
+  const saveEdit = (id) => {
+    storage.updateHour(id, editTimeFrom, editTimeTo)
+    setEditingId(null)
+    loadHours()
   }
 
   const calculateMinutes = (from, to) => {
@@ -161,7 +126,7 @@ function App() {
             {/* Add Hour Form */}
             <Card className="bg-blue-50 border-blue-200">
               <CardContent className="pt-6">
-                <form onSubmit={addHour} className="space-y-4">
+                <form onSubmit={handleAddHour} className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="timeFrom">From</Label>
@@ -262,7 +227,7 @@ function App() {
                                 <Edit2 className="h-4 w-4" />
                               </Button>
                               <Button
-                                onClick={() => deleteHour(hour.id)}
+                                onClick={() => handleDeleteHour(hour.id)}
                                 size="icon"
                                 variant="destructive"
                               >
