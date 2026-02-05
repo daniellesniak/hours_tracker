@@ -34,4 +34,13 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Force 24-hour format for time inputs */
+  input[type="time"]::-webkit-datetime-edit-ampm-field {
+    display: none;
+  }
+  input[type="time"] {
+    -webkit-appearance: textfield;
+    -moz-appearance: textfield;
+  }
 }

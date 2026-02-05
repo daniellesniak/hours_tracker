@@ -129,22 +129,26 @@ function App() {
                 <form onSubmit={handleAddHour} className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="timeFrom">From</Label>
+                      <Label htmlFor="timeFrom">From (24h)</Label>
                       <Input
                         id="timeFrom"
                         type="time"
                         value={timeFrom}
                         onChange={(e) => setTimeFrom(e.target.value)}
+                        step="60"
+                        placeholder="14:30"
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="timeTo">To</Label>
+                      <Label htmlFor="timeTo">To (24h)</Label>
                       <Input
                         id="timeTo"
                         type="time"
                         value={timeTo}
                         onChange={(e) => setTimeTo(e.target.value)}
+                        step="60"
+                        placeholder="17:00"
                         required
                       />
                     </div>
@@ -184,6 +188,7 @@ function App() {
                               type="time"
                               value={editTimeFrom}
                               onChange={(e) => setEditTimeFrom(e.target.value)}
+                              step="60"
                               className="flex-1"
                             />
                             <span>-</span>
@@ -191,6 +196,7 @@ function App() {
                               type="time"
                               value={editTimeTo}
                               onChange={(e) => setEditTimeTo(e.target.value)}
+                              step="60"
                               className="flex-1"
                             />
                             <Button
