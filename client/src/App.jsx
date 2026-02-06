@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { TimeInput } from '@/components/ui/time-input'
 import * as storage from '@/lib/storage'
 
 function App() {
@@ -129,28 +130,12 @@ function App() {
                 <form onSubmit={handleAddHour} className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="timeFrom">From (24h)</Label>
-                      <Input
-                        id="timeFrom"
-                        type="time"
-                        value={timeFrom}
-                        onChange={(e) => setTimeFrom(e.target.value)}
-                        step="60"
-                        placeholder="14:30"
-                        required
-                      />
+                      <Label>From</Label>
+                      <TimeInput value={timeFrom} onChange={setTimeFrom} required />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="timeTo">To (24h)</Label>
-                      <Input
-                        id="timeTo"
-                        type="time"
-                        value={timeTo}
-                        onChange={(e) => setTimeTo(e.target.value)}
-                        step="60"
-                        placeholder="17:00"
-                        required
-                      />
+                      <Label>To</Label>
+                      <TimeInput value={timeTo} onChange={setTimeTo} required />
                     </div>
                   </div>
                   <Button type="submit" className="w-full">
@@ -184,19 +169,15 @@ function App() {
                       <CardContent className="pt-6">
                         {editingId === hour.id ? (
                           <div className="flex items-center gap-2">
-                            <Input
-                              type="time"
+                            <TimeInput
                               value={editTimeFrom}
-                              onChange={(e) => setEditTimeFrom(e.target.value)}
-                              step="60"
+                              onChange={setEditTimeFrom}
                               className="flex-1"
                             />
-                            <span>-</span>
-                            <Input
-                              type="time"
+                            <span className="text-muted-foreground">—</span>
+                            <TimeInput
                               value={editTimeTo}
-                              onChange={(e) => setEditTimeTo(e.target.value)}
-                              step="60"
+                              onChange={setEditTimeTo}
                               className="flex-1"
                             />
                             <Button
@@ -218,7 +199,7 @@ function App() {
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4">
                               <span className="text-lg font-mono">
-                                {hour.time_from} - {hour.time_to}
+                                {hour.time_from} — {hour.time_to}
                               </span>
                               <span className="text-sm text-muted-foreground">
                                 ({calculateMinutes(hour.time_from, hour.time_to)} minutes)
