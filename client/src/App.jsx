@@ -13,9 +13,11 @@ function App() {
   const [hours, setHours] = useState([])
   const [timeFrom, setTimeFrom] = useState('')
   const [timeTo, setTimeTo] = useState('')
+  const [note, setNote] = useState('')
   const [editingId, setEditingId] = useState(null)
   const [editTimeFrom, setEditTimeFrom] = useState('')
   const [editTimeTo, setEditTimeTo] = useState('')
+  const [editNote, setEditNote] = useState('')
 
   const dateStr = format(currentDate, 'yyyy-MM-dd')
 
@@ -32,9 +34,10 @@ function App() {
     e.preventDefault()
     if (!timeFrom || !timeTo) return
 
-    storage.addHour(dateStr, timeFrom, timeTo)
+    storage.addHour(dateStr, timeFrom, timeTo, note)
     setTimeFrom('')
     setTimeTo('')
+    setNote('')
     loadHours()
   }
 
@@ -47,16 +50,18 @@ function App() {
     setEditingId(hour.id)
     setEditTimeFrom(hour.time_from)
     setEditTimeTo(hour.time_to)
+    setEditNote(hour.note || '')
   }
 
   const cancelEdit = () => {
     setEditingId(null)
     setEditTimeFrom('')
     setEditTimeTo('')
+    setEditNote('')
   }
 
   const saveEdit = (id) => {
-    storage.updateHour(id, editTimeFrom, editTimeTo)
+    storage.updateHour(id, editTimeFrom, editTimeTo, editNote)
     setEditingId(null)
     loadHours()
   }
@@ -73,10 +78,11 @@ function App() {
     return sum + calculateMinutes(hour.time_from, hour.time_to)
   }, 0)
 
-  const formatMinutes = (minutes) => {
+  const formatDuration = (minutes) => {
+    if (minutes < 60) return `${minutes}m`
     const hours = Math.floor(minutes / 60)
     const mins = minutes % 60
-    return `${hours}h ${mins}m`
+    return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`
   }
 
   const goToPreviousDay = () => setCurrentDate(subDays(currentDate, 1))
@@ -138,6 +144,11 @@ function App() {
                       <TimeInput value={timeTo} onChange={setTimeTo} required />
                     </div>
                   </div>
+                  <Input
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    placeholder="Note (optional)"
+                  />
                   <Button type="submit" className="w-full">
                     Add Hour Entry
                   </Button>
@@ -150,7 +161,7 @@ function App() {
               <div className="flex justify-between items-center">
                 <span className="text-lg font-semibold">Total Time Worked:</span>
                 <span className="text-2xl font-bold text-green-700">
-                  {formatMinutes(totalMinutes)} ({totalMinutes} minutes)
+                  {formatDuration(totalMinutes)} ({totalMinutes} min)
                 </span>
               </div>
             </div>
@@ -168,44 +179,58 @@ function App() {
                     <Card key={hour.id} className="bg-white">
                       <CardContent className="pt-6">
                         {editingId === hour.id ? (
-                          <div className="flex items-center gap-2">
-                            <TimeInput
-                              value={editTimeFrom}
-                              onChange={setEditTimeFrom}
-                              className="flex-1"
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              <TimeInput
+                                value={editTimeFrom}
+                                onChange={setEditTimeFrom}
+                                className="flex-1"
+                              />
+                              <span className="text-muted-foreground">—</span>
+                              <TimeInput
+                                value={editTimeTo}
+                                onChange={setEditTimeTo}
+                                className="flex-1"
+                              />
+                              <Button
+                                onClick={() => saveEdit(hour.id)}
+                                size="icon"
+                                variant="default"
+                              >
+                                <Save className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                onClick={cancelEdit}
+                                size="icon"
+                                variant="outline"
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                            <Input
+                              value={editNote}
+                              onChange={(e) => setEditNote(e.target.value)}
+                              placeholder="Note (optional)"
                             />
-                            <span className="text-muted-foreground">—</span>
-                            <TimeInput
-                              value={editTimeTo}
-                              onChange={setEditTimeTo}
-                              className="flex-1"
-                            />
-                            <Button
-                              onClick={() => saveEdit(hour.id)}
-                              size="icon"
-                              variant="default"
-                            >
-                              <Save className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              onClick={cancelEdit}
-                              size="icon"
-                              variant="outline"
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
                           </div>
                         ) : (
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                              <span className="text-lg font-mono">
-                                {hour.time_from} — {hour.time_to}
-                              </span>
-                              <span className="text-sm text-muted-foreground">
-                                ({calculateMinutes(hour.time_from, hour.time_to)} minutes)
-                              </span>
+                          <div className="flex items-center justify-between gap-4">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-4">
+                                <span className="text-lg font-mono">
+                                  {hour.time_from} — {hour.time_to}
+                                </span>
+                                <span className="text-sm text-muted-foreground">
+                                  {formatDuration(calculateMinutes(hour.time_from, hour.time_to))}
+                                </span>
+                              </div>
+                              {hour.note && (
+                                <p className="text-sm text-muted-foreground mt-1 truncate">
+                                  {hour.note}
+                                </p>
+                              )}
                             </div>
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 shrink-0">
                               <Button
                                 onClick={() => startEdit(hour)}
                                 size="icon"

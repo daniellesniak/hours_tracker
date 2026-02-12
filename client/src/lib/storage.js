@@ -17,13 +17,14 @@ export const getHoursByDate = (date) => {
 };
 
 // Add a new hour entry
-export const addHour = (date, timeFrom, timeTo) => {
+export const addHour = (date, timeFrom, timeTo, note = '') => {
   const allHours = getAllHours();
   const newHour = {
-    id: Date.now(), // Simple ID generation
+    id: Date.now(),
     date,
     time_from: timeFrom,
     time_to: timeTo,
+    note,
     created_at: new Date().toISOString(),
   };
   allHours.push(newHour);
@@ -32,7 +33,7 @@ export const addHour = (date, timeFrom, timeTo) => {
 };
 
 // Update an hour entry
-export const updateHour = (id, timeFrom, timeTo) => {
+export const updateHour = (id, timeFrom, timeTo, note = '') => {
   const allHours = getAllHours();
   const index = allHours.findIndex(hour => hour.id === id);
   if (index !== -1) {
@@ -40,6 +41,7 @@ export const updateHour = (id, timeFrom, timeTo) => {
       ...allHours[index],
       time_from: timeFrom,
       time_to: timeTo,
+      note,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(allHours));
     return allHours[index];
